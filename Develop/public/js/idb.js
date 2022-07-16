@@ -3,6 +3,9 @@ const { response } = require("express")
 let db
 const request = indexedDB.open("budget_tracker", 1)
 
+const transaction = db.transaction(["new_transaction"], "readwrite")
+const store = transaction.objectStore("new_transaction")
+
 request.onupgradeneeded = function (event)
 {
     const db = event.target.result
@@ -13,7 +16,7 @@ request.onsuccess = function (event)
     db = event.target.result
     if (navigator.onLine)
     {
-        // TODO: upload transaction
+        uploadBudget()
     }
 }
 request.onerror = function (event)
@@ -22,8 +25,6 @@ request.onerror = function (event)
 }
 function uploadBudget ()
 {
-    const transaction = db.transaction(["new_transaction"], "readwrite")
-    const store = transaction.objectStore("new_transaction")
     const getAll = store.getAll()
 
     getAll.onsuccess = function ()
@@ -41,10 +42,12 @@ function uploadBudget ()
             .then(response => response.json())
                 .then(response =>
                 {
-                const transaction = db.transaction(["new_transaction"], "readwrite")
-                    const store = transaction.objectStore("new_transaction")
                     store.clear()
             })
         }
     }
+}
+function saveBudget (save)
+{
+    store.add(save)
 }
