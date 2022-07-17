@@ -20,7 +20,7 @@ const FILES_TO_CACHE = [
 
 self.addEventListener("install", function (event)
 {
-    event.waitUntill(
+    event.waitUntil(
         caches.open(CACHE_NAME).then(function (cache)
         {
             console.log(CACHE_NAME + "installing");
@@ -30,10 +30,10 @@ self.addEventListener("install", function (event)
 })
 self.addEventListener("activate", function (event)
 {
-    event.waitUntill(
-        caches.keys().then(function (keys)
+    event.waitUntil(
+        caches.keys().then(function (keysList)
         {
-            let casheList = keys.filter(function (key)
+            let casheList = keysList.filter(function (key)
             {
                 return key.indexOf(APP_PREFIX)
             })
@@ -44,12 +44,28 @@ self.addEventListener("fetch", function (event)
 {
     console.log("fetching " + event.request.url)
     event.respondWith(
-        caches.match(event.request).then(function (request)
+        caches.open(CACHE_NAME).then(cache =>
         {
-            if (request)
+            return fetch(event.request).then(response =>
             {
-                return request
-            }
+                if (response.status === 200)
+                {
+                    cache.put(event.request.url, response.clone())
+                }
+                return response
+            })
+                .catch(err =>
+                {
+                return cache.match(event.request)
+                })
+            .catch(err => console.log(err))
         })
+        // caches.match(event.request).then(function (request)
+        // {
+        //     if (request)
+        //     {
+        //         return request
+        //     }
+        // })
     )
 })

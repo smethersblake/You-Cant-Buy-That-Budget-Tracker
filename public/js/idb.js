@@ -1,5 +1,3 @@
-const { response } = require("express")
-
 let db
 const request = indexedDB.open("budget_tracker", 1)
 
@@ -46,7 +44,7 @@ function uploadBudget ()
         }
     }
 }
-function saveBudget (save)
+function saveRecord (save)
 {
     store.add(save)
 }
