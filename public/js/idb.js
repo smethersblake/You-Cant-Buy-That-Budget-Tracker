@@ -37,7 +37,7 @@ function uploadBudget ()
                 }
             })
             .then(response => response.json())
-                .then(response =>
+                .then(() =>
                 {
                     store.clear()
             })
